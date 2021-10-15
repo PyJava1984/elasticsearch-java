@@ -19,30 +19,18 @@
 
 package co.elastic.clients.base;
 
-import co.elastic.clients.json.JsonpMapper;
-
-import java.io.Closeable;
-import java.io.IOException;
-import java.util.Map;
-import java.util.concurrent.CompletableFuture;
+import org.elasticsearch.client.RequestOptions;
 
 /**
- * The transport layer that allows {@link ApiClient}s to send requests.
+ * An option that can be applied to an HTTP request.
  */
-public interface Transport extends Closeable {
+public interface RequestOption {
 
-    <RequestT, ResponseT, ErrorT> ResponseT performRequest(
-        RequestT request,
-        Endpoint<RequestT, ResponseT, ErrorT> endpoint
-    ) throws IOException;
-
-    <RequestT, ResponseT, ErrorT> CompletableFuture<ResponseT> performRequestAsync(
-        RequestT request,
-        Endpoint<RequestT, ResponseT, ErrorT> endpoint
-    );
-
-    JsonpMapper jsonpMapper();
-
-    Map<String, Header> headers();
+    /**
+     * Apply the option to an existing builder object.
+     *
+     * @param builder builder to which to apply the option
+     */
+    void apply(final RequestOptions.Builder builder);
 
 }

@@ -26,10 +26,10 @@ import java.util.Map;
 import java.util.Properties;
 
 /**
- * Models a user agent, consisting of a name, version,
+ * Models a user agent header, consisting of a name, version,
  * and optional key-value metadata.
  */
-public class UserAgent {
+public class UserAgent extends Header {
 
     static final String DEFAULT_NAME = "elasticsearch-java";
 
@@ -64,6 +64,7 @@ public class UserAgent {
     private final Map<String, String> metadata;
 
     public UserAgent(String name, String version, Map<String, String> metadata) {
+        super("User-Agent", buildValueString(name, version, metadata));
         this.name = name;
         this.version = version;
         this.metadata = metadata;
@@ -73,8 +74,19 @@ public class UserAgent {
         this(repoName, version, Collections.emptyMap());
     }
 
-    @Override
-    public String toString() {
+    public String name() {
+        return name;
+    }
+
+    public String version() {
+        return version;
+    }
+
+    public Map<String, String> metadata() {
+        return metadata;
+    }
+
+    private static String buildValueString(String name, String version, Map<String, String> metadata) {
         if (metadata.isEmpty()) {
             return String.format("%s/%s", name, version);
         }
