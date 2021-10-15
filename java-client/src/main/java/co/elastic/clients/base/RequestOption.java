@@ -31,6 +31,6 @@ public interface RequestOption {
      *
      * @param builder builder to which to apply the option
      */
-    void apply(final RequestOptions.Builder builder);
+    void apply(RequestOptions.Builder builder);
 
 }

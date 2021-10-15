@@ -21,12 +21,10 @@ package co.elastic.clients.base;
 
 import org.elasticsearch.client.RequestOptions;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 import static java.util.Arrays.asList;
-import static java.util.Collections.unmodifiableList;
 
 /**
  * HTTP header field, consisting of a string key ('field') plus one
@@ -85,7 +83,7 @@ public class Header implements RequestOption {
     }
 
     @Override
-    public void apply(final RequestOptions.Builder builder) {
+    public void apply(RequestOptions.Builder builder) {
         builder.addHeader(field(), value());
     }
 
