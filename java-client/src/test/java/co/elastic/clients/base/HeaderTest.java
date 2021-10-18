@@ -19,10 +19,9 @@
 
 package co.elastic.clients.base;
 
-import co.elastic.clients.options.Header;
 import org.junit.Test;
 
-import static co.elastic.clients.options.Header.header;
+import static co.elastic.clients.base.Header.header;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
@@ -31,21 +30,14 @@ public class HeaderTest {
     @Test
     public void testSimple() {
         Header header = header("Content-Type", "application/json");
-        assertEquals("Content-Type", header.field());
+        assertEquals("Content-Type", header.name());
         assertEquals("application/json", header.value());
     }
 
     @Test
-    public void testMulti() {
-        Header header = header("Cache-Control", "no-cache", "no-store");
-        assertEquals("Cache-Control", header.field());
-        assertEquals("no-cache, no-store", header.value());
-    }
-
-    @Test
     public void testEmpty() {
-        Header header = header("Content-Length");
-        assertEquals("Content-Length", header.field());
+        Header header = header("Content-Length", null);
+        assertEquals("Content-Length", header.name());
         assertNull(header.value());
     }
 

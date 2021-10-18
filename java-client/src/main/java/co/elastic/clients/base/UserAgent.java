@@ -17,43 +17,29 @@
  * under the License.
  */
 
-package co.elastic.clients.options;
+package co.elastic.clients.base;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.Collections;
 import java.util.Map;
-import java.util.Properties;
 
 /**
- * Models a user agent header, consisting of a name, version,
+ * Models a user agent, consisting of a name, version,
  * and optional key-value metadata.
  */
-public class UserAgent extends Header {
+public class UserAgent {
 
     static final String DEFAULT_NAME = "elasticsearch-java";
 
-    // The client version is loaded from the 'version.properties' file
     static final String DEFAULT_VERSION;
     static {
-        InputStream in = UserAgent.class.getResourceAsStream("/co.elastic.clients.elasticsearch/version.properties");
-        if (in != null) {
-            Properties prop = new Properties();
-            String version;
-            try {
-                prop.load(in);
-                version = prop.getProperty("version", "?");
-            } catch (IOException e) {
-                // Unable to read properties file
-                version = "?";
-            }
-            DEFAULT_VERSION = version;
+        String version;
+        try {
+            // The client version is loaded from the 'version.properties' file
+            version = ElasticsearchVersion.loadString();
+        } catch (ElasticsearchVersion.Unavailable ex) {
+            version = "?";
         }
-        else {
-            // Unable to locate properties file
-            DEFAULT_VERSION = "?";
-        }
-        // TODO: log error if DEFAULT_VERSION now equals "?"
+        DEFAULT_VERSION = version;
     }
 
     // Default user agent, constructed from default repo name and version
@@ -64,7 +50,6 @@ public class UserAgent extends Header {
     private final Map<String, String> metadata;
 
     public UserAgent(String name, String version, Map<String, String> metadata) {
-        super("User-Agent", buildValueString(name, version, metadata));
         this.name = name;
         this.version = version;
         this.metadata = metadata;
@@ -86,7 +71,7 @@ public class UserAgent extends Header {
         return metadata;
     }
 
-    private static String buildValueString(String name, String version, Map<String, String> metadata) {
+    public String toString() {
         if (metadata.isEmpty()) {
             return String.format("%s/%s", name, version);
         }
@@ -102,6 +87,16 @@ public class UserAgent extends Header {
             }
             return String.format("%s/%s (%s)", name, version, metadataString);
         }
+    }
+
+    public static class Header extends co.elastic.clients.base.Header {
+
+        public static Header DEFAULT = new Header(UserAgent.DEFAULT);
+
+        public Header(UserAgent userAgent) {
+            super("User-Agent", userAgent.toString());
+        }
+
     }
 
 }

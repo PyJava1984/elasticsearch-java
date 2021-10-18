@@ -49,12 +49,11 @@ import org.testcontainers.elasticsearch.ElasticsearchContainer;
 
 import java.io.IOException;
 import java.time.Duration;
+import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
-
-import static java.util.Collections.singletonList;
 
 public class RequestTest extends Assert {
 
@@ -159,9 +158,9 @@ public class RequestTest extends Assert {
         assertEquals("foo", esData.getMsg());
 
         // Search, adding some request options
-        List<RequestOption> options = singletonList(
+        RequestOptions2 options = new RequestOptions2(Collections.singletonList(
                 header("x-super-header", "bar")
-        );
+        ));
 
         SearchResponse<AppData> search = new ElasticsearchClient(
             ((RestClientTransport) client._transport()).withRequestOptions(options)

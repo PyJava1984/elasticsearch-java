@@ -20,8 +20,6 @@
 package co.elastic.clients.base;
 
 import co.elastic.clients.base.rest_client.RestClientTransport;
-import co.elastic.clients.options.RequestOption;
-import co.elastic.clients.options.UserAgent;
 import org.apache.http.HttpHost;
 import org.elasticsearch.client.RestClient;
 import org.junit.AfterClass;
@@ -29,12 +27,15 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.util.List;
+import java.util.Collections;
 
-import static java.util.Collections.singletonList;
+import static co.elastic.clients.base.Header.header;
+import static co.elastic.clients.base.Header.nullHeader;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
-public class UserAgentTest {
+public class CustomHeaderTest {
 
     public static RestClient restClient;
 
@@ -51,17 +52,31 @@ public class UserAgentTest {
     @Test
     public void testDefaultUserAgent() {
         Transport transport = new RestClientTransport(restClient, null);
-        assertEquals(UserAgent.DEFAULT, transport.headers().get("User-Agent"));
+        assertEquals(UserAgent.DEFAULT.toString(), transport.headers().get("User-Agent"));
     }
 
     @Test
-    public void testManualUserAgent() {
+    public void testCustomUserAgent() {
         final String name = "ÜberClient";
         final String version = "1.0.13";
         final UserAgent userAgent = new UserAgent(name, version);
-        List<RequestOption> options = singletonList(new UserAgent(name, version));
+        final UserAgent.Header userAgentHeader = new UserAgent.Header(userAgent);
+        RequestOptions2 options = new RequestOptions2(Collections.singletonList(userAgentHeader));
         Transport transport = new RestClientTransport(restClient, null, options);
-        assertEquals(userAgent, transport.headers().get("User-Agent"));
+        assertEquals(userAgent.toString(), transport.headers().get("User-Agent"));
+    }
+
+    @Test
+    public void testDefaultClientMetadata() {
+        Transport transport = new RestClientTransport(restClient, null);
+        assertTrue(transport.headers().get("X-Elastic-Client-Meta").length() > 0);
+    }
+
+    @Test
+    public void testDisableClientMetadata() {
+        RequestOptions2 options = new RequestOptions2(Collections.singletonList(nullHeader("X-Elastic-Client-Meta")));
+        Transport transport = new RestClientTransport(restClient, null, options);
+        assertNull(transport.headers().get("X-Elastic-Client-Meta"));
     }
 
 }
