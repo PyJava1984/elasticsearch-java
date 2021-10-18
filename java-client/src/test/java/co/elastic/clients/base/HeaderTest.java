@@ -19,9 +19,10 @@
 
 package co.elastic.clients.base;
 
+import co.elastic.clients.options.Header;
 import org.junit.Test;
 
-import static co.elastic.clients.base.Header.header;
+import static co.elastic.clients.options.Header.header;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 

@@ -20,6 +20,7 @@
 package co.elastic.clients.base;
 
 import co.elastic.clients.json.JsonpMapper;
+import co.elastic.clients.options.Header;
 
 import java.io.Closeable;
 import java.io.IOException;

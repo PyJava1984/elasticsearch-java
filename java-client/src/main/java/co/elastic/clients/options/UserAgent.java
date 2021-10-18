@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package co.elastic.clients.base;
+package co.elastic.clients.options;
 
 import java.io.IOException;
 import java.io.InputStream;

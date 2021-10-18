@@ -20,6 +20,8 @@
 package co.elastic.clients.base;
 
 import co.elastic.clients.base.rest_client.RestClientTransport;
+import co.elastic.clients.options.RequestOption;
+import co.elastic.clients.options.UserAgent;
 import org.apache.http.HttpHost;
 import org.elasticsearch.client.RestClient;
 import org.junit.AfterClass;
