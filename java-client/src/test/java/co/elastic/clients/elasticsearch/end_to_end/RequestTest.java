@@ -160,9 +160,10 @@ public class RequestTest extends Assert {
         assertEquals("foo", esData.getMsg());
 
         // Search, adding some request options
-        RequestOptions2 options = new RequestOptions2(Collections.singletonList(
-                Header.raw("x-super-header", "bar")
-        ));
+        RequestOptions2 options = new RequestOptions2.Builder()
+                .withHeader(
+                        Header.raw("x-super-header", "bar"))
+                .build();
 
         SearchResponse<AppData> search = new ElasticsearchClient(
             ((RestClientTransport) client._transport()).withRequestOptions(options)
