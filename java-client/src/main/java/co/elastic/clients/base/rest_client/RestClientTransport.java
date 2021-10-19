@@ -78,10 +78,19 @@ public class RestClientTransport implements Transport {
         return mapper;
     }
 
+    /**
+     * Get a map of key-value pairs representing the base headers
+     * used by all requests going via this transport.
+     *
+     * @return
+     */
     @Override
     public Map<String, String> headers() {
         Map<String, String> headers = new TreeMap<>(String::compareToIgnoreCase);
         requestOptions.headers().forEach(header -> {
+            // Null-valued headers can be passed to cancel out certain
+            // headers from being sent, such as X-Elastic-Client-Metadata.
+            // Therefore, they are excluded here.
             if (header.value() != null) {
                 headers.put(header.name(), header.value());
             }

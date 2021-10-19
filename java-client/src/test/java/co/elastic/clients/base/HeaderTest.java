@@ -24,21 +24,37 @@ import org.junit.Test;
 import static co.elastic.clients.base.Header.header;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 public class HeaderTest {
 
     @Test
-    public void testSimple() {
+    public void testSimpleCustomHeader() {
         Header header = header("Content-Type", "application/json");
         assertEquals("Content-Type", header.name());
         assertEquals("application/json", header.value());
     }
 
     @Test
-    public void testEmpty() {
+    public void testEmptyCustomHeader() {
         Header header = header("Content-Length", null);
         assertEquals("Content-Length", header.name());
         assertNull(header.value());
+    }
+
+    @Test
+    public void testUserAgentHeader() {
+        Header header = new UserAgent.Header(UserAgent.DEFAULT);
+        assertEquals("X-Elastic-Client-Metadata", header.name());
+        assertEquals(UserAgent.DEFAULT.toString(), header.value());
+    }
+
+    @Test
+    public void testClientMetadataHeader() {
+        ClientMetadata metadata = new ClientMetadata();
+        Header header = new ClientMetadata.Header(metadata);
+        assertEquals("X-Elastic-Client-Metadata", header.name());
+        assertEquals(metadata.toString(), header.value());
     }
 
 }
