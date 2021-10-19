@@ -29,8 +29,6 @@ import org.junit.Test;
 import java.io.IOException;
 import java.util.Collections;
 
-import static co.elastic.clients.base.Header.header;
-import static co.elastic.clients.base.Header.nullHeader;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -60,8 +58,7 @@ public class HeaderIT {
         final String name = "ÜberClient";
         final String version = "1.0.13";
         final UserAgent userAgent = new UserAgent(name, version);
-        final UserAgent.Header userAgentHeader = new UserAgent.Header(userAgent);
-        RequestOptions2 options = new RequestOptions2(Collections.singletonList(userAgentHeader));
+        RequestOptions2 options = new RequestOptions2(Collections.singletonList(userAgent.toHeader()));
         Transport transport = new RestClientTransport(restClient, null, options);
         assertEquals(userAgent.toString(), transport.headers().get("User-Agent"));
     }
@@ -74,7 +71,11 @@ public class HeaderIT {
 
     @Test
     public void testDisableClientMetadata() {
-        RequestOptions2 options = new RequestOptions2(Collections.singletonList(nullHeader("X-Elastic-Client-Meta")));
+        RequestOptions2 options = new RequestOptions2(
+                Collections.singletonList(
+                        ClientMetadata.disabled().toHeader()
+                )
+        );
         Transport transport = new RestClientTransport(restClient, null, options);
         assertNull(transport.headers().get("X-Elastic-Client-Meta"));
     }

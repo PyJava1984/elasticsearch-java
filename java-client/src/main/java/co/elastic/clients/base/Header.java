@@ -22,23 +22,32 @@ package co.elastic.clients.base;
 import java.util.Objects;
 
 /**
- * HTTP header field, consisting of a string name plus one
+ * Raw HTTP header field, consisting of a string name plus one
  * or more values.
  */
-public class Header {
+public class Header implements HeaderValue {
 
-    public static Header header(String name, String value) {
-        return new Header(name, value);
-    }
-
-    public static Header nullHeader(String name) {
-        return header(name, null);
+    /**
+     * Construct a raw header field.
+     *
+     * The {@link Object#toString()} method of the value passed is
+     * used to obtain the field value sent over the wire.
+     *
+     * By convention, a null value denotes that the header with that
+     * name is disabled, and will not be sent.
+     *
+     * @param name header field name
+     * @param value header field value
+     * @return new {@link Header} object
+     */
+    public static Header raw(String name, Object value) {
+        return new Header(name, value == null ? null : value.toString());
     }
 
     private final String name;
     private final String value;
 
-    Header(String name, String value) {
+    private Header(String name, String value) {
         this.name = name;
         this.value = value;
     }
@@ -71,6 +80,11 @@ public class Header {
         else {
             return String.format("%s: %s", name(), value());
         }
+    }
+
+    @Override
+    public Header toHeader() {
+        return this;
     }
 
 }

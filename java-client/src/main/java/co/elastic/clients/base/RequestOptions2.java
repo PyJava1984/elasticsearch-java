@@ -8,8 +8,8 @@ public class RequestOptions2 {
 
     public static final RequestOptions2 DEFAULT = new RequestOptions2(
             Arrays.asList(
-                    new ClientMetadata.Header(new ClientMetadata()),
-                    UserAgent.Header.DEFAULT
+                    ClientMetadata.forLocalSystem().toHeader(),
+                    UserAgent.DEFAULT.toHeader()
             )
     );
 

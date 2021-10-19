@@ -21,14 +21,67 @@ package co.elastic.clients.base;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
 public class ClientMetadataTest {
 
     @Test
-    public void testHasMetadata() {
-        ClientMetadata metadata = new ClientMetadata();
+    public void testMetadataForLocalSystem() {
+        ClientMetadata metadata = ClientMetadata.forLocalSystem();
+        // We can't check the actual content of this system
+        // metadata, as this varies... well, by system, so
+        // instead we simply check that it contains *some* data.
         assertTrue(metadata.toString().length() > 0);
+    }
+
+    @Test
+    public void testDisabledMetadata() {
+        ClientMetadata metadata = ClientMetadata.disabled();
+        // The string value of a null-valued header is always
+        // the empty string, by definition.
+        assertEquals("", metadata.toString());
+    }
+
+    @Test
+    public void testCustomMetadata() {
+        ClientMetadata metadata = new ClientMetadata.Builder()
+                .withElasticsearchVersion(Version.parse("12.3.4"))
+                .withJavaVersion(Version.parse("1.4.2"))
+                .withTransportVersion(Version.parse("6.7"))
+                .build();
+        assertEquals("es=12.3.4,jv=1.4.2,t=6.7", metadata.toString());
+    }
+
+    @Test
+    public void testElasticsearchVersionIsMandatory() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            new ClientMetadata.Builder()
+                    .withJavaVersion(Version.parse("1.4.2"))
+                    .withTransportVersion(Version.parse("6.7"))
+                    .build();
+        });
+    }
+
+    @Test
+    public void testJavaVersionIsMandatory() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            new ClientMetadata.Builder()
+                    .withElasticsearchVersion(Version.parse("12.3.4"))
+                    .withTransportVersion(Version.parse("6.7"))
+                    .build();
+        });
+    }
+
+    @Test
+    public void testTransportVersionIsMandatory() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            new ClientMetadata.Builder()
+                    .withElasticsearchVersion(Version.parse("12.3.4"))
+                    .withJavaVersion(Version.parse("1.4.2"))
+                    .build();
+        });
     }
 
 }
