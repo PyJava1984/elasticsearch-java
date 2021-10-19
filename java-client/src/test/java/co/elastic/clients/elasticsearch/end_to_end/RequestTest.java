@@ -20,6 +20,7 @@
 package co.elastic.clients.elasticsearch.end_to_end;
 
 import co.elastic.clients.base.BooleanResponse;
+import co.elastic.clients.base.RequestOptions2;
 import co.elastic.clients.base.Transport;
 import co.elastic.clients.base.rest_client.RestClientTransport;
 import co.elastic.clients.elasticsearch.ElasticsearchAsyncClient;
@@ -54,6 +55,8 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+
+import static co.elastic.clients.base.Header.header;
 
 public class RequestTest extends Assert {
 
