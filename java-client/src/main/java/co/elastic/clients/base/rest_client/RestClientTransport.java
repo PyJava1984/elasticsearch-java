@@ -23,7 +23,7 @@ import co.elastic.clients.base.BooleanEndpoint;
 import co.elastic.clients.base.BooleanResponse;
 import co.elastic.clients.base.ElasticsearchCatRequest;
 import co.elastic.clients.base.Endpoint;
-import co.elastic.clients.base.RequestOptions2;
+import co.elastic.clients.base.RequestOptions;
 import co.elastic.clients.base.Transport;
 import co.elastic.clients.elasticsearch.ElasticsearchException;
 import co.elastic.clients.elasticsearch._types.ErrorResponse;
@@ -35,7 +35,6 @@ import jakarta.json.stream.JsonParser;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.entity.ContentType;
 import org.elasticsearch.client.Cancellable;
-import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.Response;
 import org.elasticsearch.client.ResponseListener;
 import org.elasticsearch.client.RestClient;
@@ -54,12 +53,12 @@ public class RestClientTransport implements Transport {
 
     private final RestClient restClient;
     private final JsonpMapper mapper;
-    private final RequestOptions2 requestOptions;
+    private final RequestOptions requestOptions;
 
-    public RestClientTransport(RestClient restClient, JsonpMapper mapper, @Nullable RequestOptions2 options) {
+    public RestClientTransport(RestClient restClient, JsonpMapper mapper, @Nullable RequestOptions options) {
         this.restClient = restClient;
         this.mapper = mapper;
-        this.requestOptions = RequestOptions2.DEFAULT.with(options);
+        this.requestOptions = RequestOptions.DEFAULT.toBuilder().withOptions(options).build();
     }
 
     public RestClientTransport(RestClient restClient, JsonpMapper mapper) {
@@ -69,7 +68,7 @@ public class RestClientTransport implements Transport {
     /**
      * Creates a new {@link #RestClientTransport} with specific request options.
      */
-    public RestClientTransport withRequestOptions(@Nullable RequestOptions2 options) {
+    public RestClientTransport withRequestOptions(@Nullable RequestOptions options) {
         return new RestClientTransport(this.restClient, this.mapper, options);
     }
 
@@ -162,7 +161,7 @@ public class RestClientTransport implements Transport {
         Map<String, String> params = endpoint.queryParameters(request);
 
         org.elasticsearch.client.Request clientReq = new org.elasticsearch.client.Request(method, path);
-        org.elasticsearch.client.RequestOptions.Builder optBuilder = RequestOptions.DEFAULT.toBuilder();
+        org.elasticsearch.client.RequestOptions.Builder optBuilder = org.elasticsearch.client.RequestOptions.DEFAULT.toBuilder();
         headers().forEach((name, value) -> optBuilder.addHeader(name, value));
         clientReq.addParameters(params);
         clientReq.setOptions(optBuilder.build());

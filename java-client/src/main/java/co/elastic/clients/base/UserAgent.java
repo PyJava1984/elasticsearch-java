@@ -30,19 +30,8 @@ public class UserAgent implements HeaderValue {
 
     static final String DEFAULT_NAME = "elasticsearch-java";
 
-    static final String DEFAULT_VERSION;
-    static {
-        String version;
-        try {
-            // The client version is loaded from the 'version.properties' file
-            version = ElasticsearchVersion.loadString();
-        } catch (ElasticsearchVersion.Unavailable ex) {
-            version = "?";
-        }
-        DEFAULT_VERSION = version;
-    }
+    static final String DEFAULT_VERSION = ClientMetadata.getElasticsearchVersionString();
 
-    // Default user agent, constructed from default repo name and version
     public static final UserAgent DEFAULT = new UserAgent(DEFAULT_NAME, DEFAULT_VERSION);
 
     private final String name;
@@ -73,7 +62,7 @@ public class UserAgent implements HeaderValue {
 
     public String toString() {
         if (metadata.isEmpty()) {
-            return String.format("%s/%s", name, version);
+            return String.format("%s/%s", name, version == null ? '?' : version);
         }
         else {
             StringBuilder metadataString = new StringBuilder();
@@ -85,7 +74,7 @@ public class UserAgent implements HeaderValue {
                 metadataString.append(' ');
                 metadataString.append(entry.getValue());
             }
-            return String.format("%s/%s (%s)", name, version, metadataString);
+            return String.format("%s/%s (%s)", name, version == null ? '?' : version, metadataString);
         }
     }
 

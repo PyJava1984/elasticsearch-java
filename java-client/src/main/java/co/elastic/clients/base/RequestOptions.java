@@ -20,6 +20,7 @@
 package co.elastic.clients.base;
 
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -27,10 +28,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
-public class RequestOptions2 {
+public class RequestOptions {
 
-    public static final RequestOptions2 DEFAULT = new RequestOptions2(
+    public static final RequestOptions DEFAULT = new RequestOptions(
 
             // Default headers
             Arrays.asList(
@@ -56,7 +58,7 @@ public class RequestOptions2 {
         private Duration timeout;
         private Consumer<List<String>> onWarning;
 
-        public Builder() {
+        private Builder() {
             this.headers = new TreeMap<>();
             this.parameters = new HashMap<>();
             this.timeout = null;
@@ -83,8 +85,22 @@ public class RequestOptions2 {
             return this;
         }
 
-        public Iterable<Header> headers() {
-            return headers.values();
+        public Builder withOptions(RequestOptions other) {
+            if (other != null) {
+                other.headers.values().forEach(this::withHeader);
+                other.parameters.forEach(this::withParameter);
+                if (other.timeout != null) {
+                    this.withTimeout(other.timeout);
+                }
+                if (other.onWarning != null) {
+                    this.withWarningHandler(other.onWarning);
+                }
+            }
+            return this;
+        }
+
+        public List<Header> headers() {
+            return new ArrayList<>(headers.values());
         }
 
         public Map<String, String> parameters() {
@@ -99,8 +115,8 @@ public class RequestOptions2 {
             return onWarning;
         }
 
-        public RequestOptions2 build() {
-            return new RequestOptions2(headers(), parameters(), timeout(), onWarning());
+        public RequestOptions build() {
+            return new RequestOptions(headers.values(), parameters, timeout, onWarning);
         }
 
     }
@@ -110,7 +126,7 @@ public class RequestOptions2 {
     private final Duration timeout;
     private final Consumer<List<String>> onWarning;
 
-    public RequestOptions2(Iterable<Header> headers, Map<String, String> parameters, Duration timeout, Consumer<List<String>> onWarning) {
+    private RequestOptions(Iterable<Header> headers, Map<String, String> parameters, Duration timeout, Consumer<List<String>> onWarning) {
         this.headers = new TreeMap<>(String::compareToIgnoreCase);
         headers.forEach(this::putHeader);
         this.parameters = Collections.unmodifiableMap(parameters);
@@ -122,8 +138,23 @@ public class RequestOptions2 {
         this.headers.put(header.name(), header);
     }
 
-    public Iterable<Header> headers() {
-        return headers.values();
+    /**
+     * Returns all headers with a non-null value.
+     *
+     * Internally, headers may contain null values, which can be used to
+     * "silence" features such as tracking. While this information needs to
+     * be propagated through the {@link Builder} process, it is not required
+     * in the final compiled list of headers, which this method provides
+     * access to.
+     *
+     * To access the full list of headers, including null-valued headers,
+     * first convert to a {@link Builder}, e.g.:
+     * {@code List<Header> allHeaders = options.toBuilder().headers();}
+     *
+     * @return list of {@link Header} objects
+     */
+    public List<Header> headers() {
+        return headers.values().stream().filter(header -> header.value() != null).collect(Collectors.toList());
     }
 
     public Map<String, String> parameters() {
@@ -138,12 +169,8 @@ public class RequestOptions2 {
         return onWarning;
     }
 
-    public RequestOptions2 with(RequestOptions2 other) {
-        RequestOptions2 options = new RequestOptions2(headers(), parameters(), timeout(), onWarning());
-        if (other != null) {
-            other.headers().forEach(header -> options.headers.put(header.name(), header));
-        }
-        return options;
+    public Builder toBuilder() {
+        return new Builder().withOptions(this);
     }
 
 }

@@ -21,7 +21,7 @@ package co.elastic.clients.elasticsearch.end_to_end;
 
 import co.elastic.clients.base.BooleanResponse;
 import co.elastic.clients.base.Header;
-import co.elastic.clients.base.RequestOptions2;
+import co.elastic.clients.base.RequestOptions;
 import co.elastic.clients.base.Transport;
 import co.elastic.clients.base.rest_client.RestClientTransport;
 import co.elastic.clients.elasticsearch.ElasticsearchAsyncClient;
@@ -51,7 +51,6 @@ import org.testcontainers.elasticsearch.ElasticsearchContainer;
 
 import java.io.IOException;
 import java.time.Duration;
-import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -160,7 +159,7 @@ public class RequestTest extends Assert {
         assertEquals("foo", esData.getMsg());
 
         // Search, adding some request options
-        RequestOptions2 options = new RequestOptions2.Builder()
+        RequestOptions options = RequestOptions.DEFAULT.toBuilder()
                 .withHeader(
                         Header.raw("x-super-header", "bar"))
                 .build();

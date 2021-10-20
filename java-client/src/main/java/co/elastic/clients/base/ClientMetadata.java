@@ -19,8 +19,11 @@
 
 package co.elastic.clients.base;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 /**
  * TODO
@@ -29,18 +32,13 @@ import java.util.List;
  */
 public class ClientMetadata implements HeaderValue {
 
+    public static final String VERSION_PROPERTIES = "/co.elastic.clients.elasticsearch/version.properties";
+
     public static ClientMetadata forLocalSystem() {
-        Version esVersion;
-        try {
-            esVersion = ElasticsearchVersion.load();
-        } catch (ElasticsearchVersion.Unavailable ex) {
-            // If the version is not available, skip adding
-            // the "es" segment to the metadata string.
-            esVersion = null;
-        }
+        Version esVersion = getElasticsearchVersion();
         return new Builder()
                 .withElasticsearchVersion(esVersion)
-                .withJavaVersion(JavaVersion.load())
+                .withJavaVersion(getJavaVersion())
                 .withTransportVersion(esVersion)
                 .build();
     }
@@ -150,6 +148,15 @@ public class ClientMetadata implements HeaderValue {
         return bits;
     }
 
+    /**
+     * Convert this client metadata instance into a {@link Header}
+     * for inclusion in an HTTP request.
+     *
+     * The resulting {@link Header#value()} may be null, which denotes
+     * that metadata tracking should be disabled.
+     *
+     * @return {@code X-Elastic-Client-Meta} {@link Header}
+     */
     @Override
     public Header toHeader() {
         // According to the spec, "There must be at least one key-value
@@ -165,6 +172,51 @@ public class ClientMetadata implements HeaderValue {
         else {
             return Header.raw("X-Elastic-Client-Meta", this);
         }
+    }
+
+    /**
+     * Fetch and return Java version information as a
+     * {@link Version} object.
+     *
+     * @return Java {@link Version}
+     */
+    public static Version getJavaVersion() {
+        return Version.parse(System.getProperty("java.version"));
+    }
+
+    /**
+     * Fetch and return Elasticsearch version information
+     * in raw string form.
+     *
+     * @return Elasticsearch version string
+     */
+    public static String getElasticsearchVersionString() {
+        InputStream in = ApiClient.class.getResourceAsStream(VERSION_PROPERTIES);
+        if (in == null) {
+            // Failed to locate version.properties file
+            return null;
+        }
+        Properties properties = new Properties();
+        try {
+            properties.load(in);
+            // This will return null if no version information is
+            // found in the version.properties file
+            return properties.getProperty("version");
+        } catch (IOException e) {
+            // Failed to read version.properties file
+            return null;
+        }
+    }
+
+    /**
+     * Fetch and return Elasticsearch version information
+     * as a {@link Version} object.
+     *
+     * @return Elasticsearch {@link Version}
+     */
+    public static Version getElasticsearchVersion() {
+        String versionString = getElasticsearchVersionString();
+        return versionString == null ? null : Version.parse(versionString);
     }
 
 }
