@@ -19,13 +19,13 @@
 
 package co.elastic.clients.base;
 
-import java.util.Objects;
+import co.elastic.clients.util.NamedValue;
 
 /**
  * Raw HTTP header field, consisting of a string name plus one
  * or more values.
  */
-public class Header implements HeaderValue {
+public class Header extends NamedValue<String> implements HeaderValue {
 
     /**
      * Construct a raw header field.
@@ -44,42 +44,8 @@ public class Header implements HeaderValue {
         return new Header(name, value == null ? null : value.toString());
     }
 
-    private final String name;
-    private final String value;
-
     private Header(String name, String value) {
-        this.name = name;
-        this.value = value;
-    }
-
-    public String name() {
-        return name;
-    }
-
-    public String value() {
-        return value;
-    }
-
-    @Override
-    public boolean equals(Object other) {
-        if (this == other) return true;
-        if (!(other instanceof Header)) return false;
-        Header header = (Header) other;
-        return name.equalsIgnoreCase(header.name()) && Objects.equals(value(), header.value());
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(name(), value());
-    }
-
-    public String toString() {
-        if (value() == null) {
-            return "";
-        }
-        else {
-            return String.format("%s: %s", name(), value());
-        }
+        super(name, value);
     }
 
     @Override
