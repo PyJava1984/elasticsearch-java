@@ -22,6 +22,7 @@ package co.elastic.clients.base;
 import org.junit.Test;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -83,11 +84,23 @@ public class RequestOptionsTest {
 
     @Test
     public void testCustomUserAgent() {
+        UserAgent userAgent = new UserAgent("MegaClient", "1.2.3");
         RequestOptions options = RequestOptions.DEFAULT.toBuilder()
-                .withHeader(new UserAgent("MegaClient", "1.2.3").toHeader())
+                .withHeader(userAgent.toHeader())
                 .build();
         Collection<Header> headers = options.headers();
         assertTrue(headers.contains(Header.raw("User-Agent", "MegaClient/1.2.3")));
+    }
+
+    @Test
+    public void testCustomUserAgentWithMetadata() {
+        UserAgent userAgent = new UserAgent("MegaClient", "1.2.3",
+                Collections.singletonMap("AmigaOS", "4.1"));
+        RequestOptions options = RequestOptions.DEFAULT.toBuilder()
+                .withHeader(userAgent.toHeader())
+                .build();
+        Collection<Header> headers = options.headers();
+        assertTrue(headers.contains(Header.raw("User-Agent", "MegaClient/1.2.3 (AmigaOS 4.1)")));
     }
 
     @Test
@@ -98,6 +111,27 @@ public class RequestOptionsTest {
                 .build();
         Collection<Header> headers = options.headers();
         assertTrue(headers.contains(customHeader));
+    }
+
+    @Test
+    public void testOpaqueID() {
+        Header idHeader = new OpaqueID("ABC123").toHeader();
+        RequestOptions options = RequestOptions.DEFAULT.toBuilder()
+                .withHeader(idHeader)
+                .build();
+        Collection<Header> headers = options.headers();
+        assertTrue(headers.contains(idHeader));
+    }
+
+    @Test
+    public void testNullOpaqueIDShouldDisableHeader() {
+        Header idHeader = new OpaqueID(null).toHeader();
+        RequestOptions options = RequestOptions.DEFAULT.toBuilder()
+                .withHeader(idHeader)
+                .build();
+        List<Header> idHeaders = options.headers().stream().filter(header ->
+                header.name().equalsIgnoreCase("X-Opaque-ID")).collect(Collectors.toList());
+        assertEquals(0, idHeaders.size());
     }
 
 }

@@ -19,30 +19,39 @@
 
 package co.elastic.clients.base;
 
-import org.junit.Test;
+import java.util.Objects;
 
-import java.util.Collections;
+/**
+ * A user-specified Opaque ID as used in the X-Opaque-ID header.
+ */
+public class OpaqueID implements ConvertibleToHeader {
 
-import static org.junit.Assert.assertEquals;
+    private final Object value;
 
-public class UserAgentTest {
-
-    @Test
-    public void testSimple() {
-        UserAgent userAgent = new UserAgent("MegaClient", "1.2.3");
-        assertEquals("MegaClient", userAgent.name());
-        assertEquals("1.2.3", userAgent.version());
-        assertEquals("MegaClient/1.2.3", userAgent.toString());
+    public OpaqueID(Object value) {
+        this.value = value;
     }
 
-    @Test
-    public void testWithMetadata() {
-        UserAgent userAgent = new UserAgent("MegaClient", "1.2.3",
-                Collections.singletonMap("AmigaOS", "4.1"));
-        assertEquals("MegaClient", userAgent.name());
-        assertEquals("1.2.3", userAgent.version());
-        assertEquals(Collections.singletonMap("AmigaOS", "4.1"), userAgent.metadata());
-        assertEquals("MegaClient/1.2.3 (AmigaOS 4.1)", userAgent.toString());
+    public Object value() {
+        return value;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof OpaqueID)) return false;
+        OpaqueID opaqueID = (OpaqueID) o;
+        return Objects.equals(value, opaqueID.value);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(value);
+    }
+
+    @Override
+    public Header toHeader() {
+        return Header.raw("X-Opaque-ID", value);
     }
 
 }
