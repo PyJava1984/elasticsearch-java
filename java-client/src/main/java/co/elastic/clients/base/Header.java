@@ -25,7 +25,7 @@ import co.elastic.clients.util.NamedValue;
  * Raw HTTP header field, consisting of a string name plus one
  * or more values.
  */
-public class Header extends NamedValue<String> implements HeaderValue {
+public class Header extends NamedValue<String> implements ConvertibleToHeader {
 
     /**
      * Construct a raw header field.

@@ -30,7 +30,7 @@ import java.util.Properties;
  *
  * e.g. es=7.10.0,py=3.10.0p,t=7.10.0,ur=1.25.10,h=b
  */
-public class ClientMetadata implements HeaderValue {
+public class ClientMetadata implements ConvertibleToHeader {
 
     public static final String VERSION_PROPERTIES = "/co.elastic.clients.elasticsearch/version.properties";
 

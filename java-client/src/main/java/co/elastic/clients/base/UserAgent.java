@@ -26,7 +26,7 @@ import java.util.Map;
  * Models a user agent, consisting of a name, version,
  * and optional key-value metadata.
  */
-public class UserAgent implements HeaderValue {
+public class UserAgent implements ConvertibleToHeader {
 
     static final String DEFAULT_NAME = "elasticsearch-java";
 

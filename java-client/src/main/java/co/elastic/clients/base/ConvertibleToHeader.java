@@ -23,7 +23,7 @@ package co.elastic.clients.base;
  * Interface implemented by any classes whose instances
  * can represent an HTTP header value, such as {@link UserAgent}.
  */
-public interface HeaderValue {
+public interface ConvertibleToHeader {
 
     /**
      * Convert this object into an HTTP header.
