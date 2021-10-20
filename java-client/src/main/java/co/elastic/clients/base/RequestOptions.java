@@ -54,13 +54,13 @@ public class RequestOptions {
     public static class Builder {
 
         private final Map<String, Header> headers;
-        private final Map<String, String> parameters;
+        private final Map<String, String> queryParameters;
         private Duration timeout;
         private Consumer<List<String>> onWarning;
 
         private Builder() {
             this.headers = new TreeMap<>();
-            this.parameters = new HashMap<>();
+            this.queryParameters = new HashMap<>();
             this.timeout = null;
             this.onWarning = null;
         }
@@ -70,8 +70,8 @@ public class RequestOptions {
             return this;
         }
 
-        public Builder withParameter(String name, String value) {
-            parameters.put(name, value);
+        public Builder withQueryParameter(String name, String value) {
+            queryParameters.put(name, value);
             return this;
         }
 
@@ -88,7 +88,7 @@ public class RequestOptions {
         public Builder withOptions(RequestOptions other) {
             if (other != null) {
                 other.headers.values().forEach(this::withHeader);
-                other.parameters.forEach(this::withParameter);
+                other.queryParameters.forEach(this::withQueryParameter);
                 if (other.timeout != null) {
                     this.withTimeout(other.timeout);
                 }
@@ -103,8 +103,8 @@ public class RequestOptions {
             return new ArrayList<>(headers.values());
         }
 
-        public Map<String, String> parameters() {
-            return parameters;
+        public Map<String, String> queryParameters() {
+            return queryParameters;
         }
 
         public Duration timeout() {
@@ -116,20 +116,23 @@ public class RequestOptions {
         }
 
         public RequestOptions build() {
-            return new RequestOptions(headers.values(), parameters, timeout, onWarning);
+            return new RequestOptions(headers.values(), queryParameters, timeout, onWarning);
         }
 
     }
 
     private final Map<String, Header> headers;
-    private final Map<String, String> parameters;
+    private final Map<String, String> queryParameters;
     private final Duration timeout;
     private final Consumer<List<String>> onWarning;
 
-    private RequestOptions(Iterable<Header> headers, Map<String, String> parameters, Duration timeout, Consumer<List<String>> onWarning) {
+    private RequestOptions(Iterable<Header> headers,
+                           Map<String, String> queryParameters,
+                           Duration timeout,
+                           Consumer<List<String>> onWarning) {
         this.headers = new TreeMap<>(String::compareToIgnoreCase);
         headers.forEach(this::putHeader);
-        this.parameters = Collections.unmodifiableMap(parameters);
+        this.queryParameters = Collections.unmodifiableMap(queryParameters);
         this.timeout = timeout;
         this.onWarning = onWarning;
     }
@@ -157,8 +160,8 @@ public class RequestOptions {
         return headers.values().stream().filter(header -> header.value() != null).collect(Collectors.toList());
     }
 
-    public Map<String, String> parameters() {
-        return parameters;
+    public Map<String, String> queryParameters() {
+        return queryParameters;
     }
 
     public Duration timeout() {
